@@ -57,6 +57,8 @@ textarea{min-height:84px;resize:vertical}
 .sum dd.e{color:#b9b2a5}
 .send{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
 .send .btn{width:100%}
+.send.one{grid-template-columns:1fr}
+.linkbtn{font:inherit;font-size:13px;background:none;border:0;padding:4px 0;color:var(--gold);text-decoration:underline;cursor:pointer}
 .done{color:var(--ok);font-size:14px;margin-top:10px;min-height:20px}
 .foot{color:var(--mute);font-size:13px;margin-top:26px}
 .admin label{display:block;font-weight:600;color:var(--navy);margin-top:16px}
@@ -100,40 +102,41 @@ textarea{min-height:84px;resize:vertical}
 /* ---------- The questions. Edit here; everything else follows. ---------- */
 var has=function(a,id,v){var x=a[id];return Array.isArray(x)?x.some(function(o){return o.indexOf(v)===0}):x===v};
 var SECTIONS=[
+{title:"You and your team",qs:[
+ {id:"business",t:"What does your business do?",h:"One line is enough.",type:"text"},
+ {id:"size",t:"How many people work in the business?",type:"single",opts:["Just me","2 to 5","6 to 20","More than 20"]},
+ {id:"people",t:"Who besides you will use the system?",type:"multi",opts:["Nobody","An assistant","A business partner","Employees","Family","An accountant or advisor"],other:"Other"},
+ {id:"roles",t:"Who are they, and what does each one do?",h:"Name and role for each person, one line each.",type:"long",when:function(a){var x=a.people||[];return x.length&&!(x.length===1&&x[0]==="Nobody")}}
+]},
 {title:"Devices",qs:[
  {id:"phone",t:"Your phone",type:"multi",opts:["iPhone","Android","More than one phone"]},
- {id:"android",t:"Which Android?",h:"Brand is enough: Samsung, Pixel, Xiaomi.",type:"text",when:function(a){return has(a,"phone","Android")}},
+ {id:"android",t:"Which Android?",type:"single",opts:["Samsung","Google Pixel","Xiaomi"],other:"Other brand",when:function(a){return has(a,"phone","Android")}},
  {id:"computers",t:"Computers you use today",type:"multi",opts:["Mac","Windows","iPad or tablet","None, I work from the phone"]},
- {id:"where",t:"Where does your working day happen?",h:"This decides what we open to the phone and what stays on the machine only.",type:"single",opts:["Almost all on the phone","Mostly phone","Half and half","Mostly computer"]}
+ {id:"where",t:"Where does your working day happen?",h:"This decides what we open to the phone and what stays on the computer only.",type:"single",opts:["Almost all on the phone","Mostly phone","Half and half","Mostly computer"]}
 ]},
 {title:"Email and calendar",qs:[
- {id:"email",t:"Email",type:"multi",opts:["Gmail / Google Workspace","Outlook / Microsoft 365","iCloud"],other:"Other provider"},
+ {id:"email",t:"Email",type:"multi",opts:["Gmail / Google Workspace","Outlook / Microsoft 365","iCloud"],other:"Other"},
  {id:"mailboxes",t:"How many mailboxes?",type:"single",opts:["One","Two or three","More"]},
- {id:"calendar",t:"Calendar",type:"multi",opts:["Google","Outlook","Apple","Paper, or none"]}
+ {id:"calendar",t:"Calendar",type:"multi",opts:["Google","Outlook","Apple","Paper, or none"],other:"Other"}
 ]},
 {title:"Messages and calls",qs:[
- {id:"channels",t:"Where do you talk business?",type:"multi",opts:["WhatsApp","WhatsApp Business","Phone calls","Telegram","Signal","Zoom / Teams / Meet","Instagram / Facebook","SMS / iMessage"]},
- {id:"wabackup",t:"Is your WhatsApp backed up?",h:"The backup is how years of chats come in on Day 1.",type:"single",opts:["Yes, to iCloud","Yes, to Google","No","Not sure"],when:function(a){return has(a,"channels","WhatsApp")}},
+ {id:"channels",t:"Where do you talk business?",type:"multi",opts:["WhatsApp","WhatsApp Business","Phone calls","Telegram","Signal","Zoom / Teams / Meet","Instagram / Facebook","SMS / iMessage"],other:"Other"},
+ {id:"wabackup",t:"Is your WhatsApp backed up?",h:"The backup is how years of chats come in on Day 1.",type:"single",opts:["Yes, to iCloud","Yes, to Google","No","I don't know"],when:function(a){return has(a,"channels","WhatsApp")}},
  {id:"callrec",t:"Do you record your calls today?",type:"single",opts:["Yes","No, but I would like to","No, and I prefer not to"],when:function(a){return has(a,"channels","Phone calls")}},
- {id:"languages",t:"Which languages are the calls, messages and documents in?",type:"multi",opts:["English","Hebrew","Dutch","French","German","Spanish"],other:"Other languages"}
+ {id:"languages",t:"Which languages are the calls, messages and documents in?",type:"multi",opts:["English","Hebrew","Dutch / Flemish","French","German","Spanish"],other:"Other"}
 ]},
 {title:"Documents and software",qs:[
- {id:"docs",t:"Where are the documents?",type:"multi",opts:["Folders on the computer","Google Drive","iCloud","Dropbox","OneDrive","Only in email or WhatsApp","Paper"]},
- {id:"software",t:"Which programs run the business?",h:"Accounting, invoicing, banking, anything specific to your field. Names are enough.",type:"long"},
- {id:"ai",t:"AI you already use",type:"multi",opts:["ChatGPT","Claude","Gemini","Copilot","None"]},
+ {id:"docs",t:"Where are the documents?",type:"multi",opts:["Folders on the computer","Google Drive","iCloud","Dropbox","OneDrive","Only in email or WhatsApp","Paper"],other:"Other"},
+ {id:"software",t:"Which programs run the business?",type:"multi",opts:["Accounting","Invoicing","Online banking","CRM","Excel / Google Sheets","Project or property management"],other:"Names of the programs (names are enough)"},
+ {id:"ai",t:"AI you already use",type:"multi",opts:["ChatGPT","Claude","Gemini","Copilot","None"],other:"Other"},
  {id:"history",t:"How far back should the system go?",type:"single",opts:["Everything I have","The last five years","The last two years","Let's decide together"]}
 ]},
 {title:"Security",qs:[
- {id:"sectoday",t:"What do you already use?",type:"multi",opts:["Password manager","Two-step login on email","VPN","Backup","None of these"]},
- {id:"people",t:"Who besides you should be able to use the system?",type:"multi",opts:["Nobody","An assistant","A business partner","Family","An accountant or advisor"],other:"Names or roles. Also: anyone who has access to your email or phone today"},
- {id:"never",t:"What must never enter the system?",h:"People, chats, folders or subjects. “Nothing” is also an answer.",type:"long"},
- {id:"private",t:"Do you want a private model on the machine?",h:"A model that runs only on your machine, for questions and material that should never go to an online service. It decides how strong a machine we order.",type:"single",opts:["Yes","Not needed","Tell me more first"]},
- {id:"worry",t:"What worries you most about having everything in one place?",type:"long",optional:true}
+ {id:"sectoday",t:"What do you already use?",type:"multi",opts:["Password manager","Two-step login on email","VPN","Backup","None of these","I don't know"]},
+ {id:"worry",t:"What worries you most about making this change?",h:"Moving your information into one private system. Tick what applies.",type:"multi",opts:["The time it takes","The effort it takes from me","The cost","Information leaking","Someone seeing my private life","Losing control of my data"],other:"Anything else"}
 ]},
-{title:"The visit",qs:[
- {id:"place",t:"Where will the machine sit?",h:"Country, city, and whether it is your home or your office.",type:"text"},
- {id:"wired",t:"Is there wired internet at that spot?",type:"single",opts:["Yes","No","Not sure"]},
- {id:"dates",t:"Which dates work for two to three days with us?",type:"long"},
+{title:"Physical setup",qs:[
+ {id:"place",t:"Where will your main computer sit?",h:"The computer we set up for you. Country, city, and home or office.",type:"text"},
  {id:"else",t:"Anything else we should know?",type:"long",optional:true}
 ]}
 ];
@@ -157,10 +160,10 @@ function build(){
  var w=el("section","step on");w.id="welcome";
  w.appendChild(el("p","kicker","Before we start"));
  w.appendChild(el("h1","","Your setup"));
- w.appendChild(el("p","meta",(CLIENT?"For "+CLIENT+(WITH?" and "+WITH:"")+"  ·  ":"")+"about 8 minutes  ·  mostly ticking boxes"));
- w.appendChild(el("p","lead","A few questions about what you use today, so the machine arrives ready for you. Your business itself comes later, once the base is built. Skip anything you are not sure about."));
+ w.appendChild(el("p","meta",(CLIENT?"For "+CLIENT+(WITH?" and "+WITH:"")+"  ·  ":"")+"about 6 minutes  ·  mostly ticking boxes"));
+ w.appendChild(el("p","lead","A few questions about you, your team and what you use today, so the system arrives ready for you. Not sure about something? Leave it empty, we will close it together."));
  var b=el("div","box");b.appendChild(el("b","","Answers only. "));
- b.appendChild(document.createTextNode("Please do not write passwords or account numbers, and do not send documents or files. This page sends nothing by itself: your answers stay in this browser until you send them to us yourself, at the end."));
+ b.appendChild(document.createTextNode("Please do not write passwords or account numbers, and do not send documents or files. Nothing is sent until you press Finish at the end."));
  w.appendChild(b);
  if(!CLIENT){var nq=qbox({id:"name",t:"Your name",type:"text"});w.appendChild(nq)}
  var s=el("button","btn gold","Start");s.id="start";s.type="button";s.style.marginTop="26px";s.onclick=function(){go(0)};
@@ -170,7 +173,7 @@ function build(){
  SECTIONS.forEach(function(sec,i){
   var st=el("section","step");
   var sh=el("div","sh");sh.appendChild(el("span","l",String(i+1)));sh.appendChild(el("h2","",sec.title));st.appendChild(sh);
-  st.appendChild(el("p","count","Part "+(i+1)+" of "+SECTIONS.length));
+  st.appendChild(el("p","count","Part "+(i+1)+" of "+SECTIONS.length+"  ·  leave empty anything you are not sure about"));
   sec.qs.forEach(function(q){st.appendChild(qbox(q))});
   app.appendChild(st);steps.push(st);
  });
@@ -252,21 +255,19 @@ function review(){
   s.appendChild(dl);r.appendChild(s);
  });
  r.insertBefore(el("p","meta",open?open+" not answered. That is fine, we can close them on a call.":"Everything is answered."),r.children[1]);
- var b=el("div","box");b.appendChild(el("b","","Nothing has been sent yet. "));
- b.appendChild(document.createTextNode("Choose how to send your answers to us."));r.appendChild(b);
- var g=el("div","send"),txt=summary(),sub="Private Office setup answers"+(who()?" · "+who():"");
+ var g=el("div","send one"),txt=summary(),sub="Private Office setup answers"+(who()?" · "+who():"");
  var done=el("p","done");
- var link=function(label,href,cls){var a=el("a","btn"+(cls||""),label);a.href=href;a.target="_blank";a.rel="noopener noreferrer";g.appendChild(a)};
- link("Send by WhatsApp","https://wa.me/"+WA+"?text="+encodeURIComponent(txt)," gold");
- link("Send by email","mailto:"+MAIL+"?subject="+encodeURIComponent(sub)+"&body="+encodeURIComponent(txt));
- var c=el("button","btn ghost","Copy the answers");c.type="button";
+ var href=MAIL||!WA?"mailto:"+MAIL+"?subject="+encodeURIComponent(sub)+"&body="+encodeURIComponent(txt):"https://wa.me/"+WA+"?text="+encodeURIComponent(txt);
+ var f=el("a","btn gold","Finish and send");f.href=href;f.target="_blank";f.rel="noopener noreferrer";
+ f.onclick=function(){done.textContent="Thank you. Your answers are on their way to us."};
+ g.appendChild(f);r.appendChild(g);r.appendChild(done);
+ var alt=el("p","foot");var c=el("button","linkbtn","Copy the answers instead");c.type="button";
  c.onclick=function(){var ok=function(){done.textContent="Copied. Paste it into a message to us."};
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(ok,fallback);else fallback();
-  function fallback(){var t=el("textarea");t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand("copy");ok()}catch(e){done.textContent="Could not copy. Please use WhatsApp or email."}t.remove()}};
- g.appendChild(c);
- var x=el("button","btn ghost","Clear my answers from this browser");x.type="button";
+  function fallback(){var t=el("textarea");t.value=txt;document.body.appendChild(t);t.select();try{document.execCommand("copy");ok()}catch(e){done.textContent="Could not copy. Please use Finish and send."}t.remove()}};
+ var x=el("button","linkbtn","Clear my answers from this browser");x.type="button";
  x.onclick=function(){if(confirm("Remove your answers from this browser? Do this after you have sent them.")){try{localStorage.removeItem(KEY)}catch(e){}A={};location.reload()}};
- g.appendChild(x);r.appendChild(g);r.appendChild(done);
+ alt.appendChild(c);alt.appendChild(document.createTextNode("  ·  "));alt.appendChild(x);r.appendChild(alt);
  r.appendChild(el("p","foot","Your answers are kept only in this browser, so you can stop and come back. Once you have sent them, you can clear them here."));
 }
 
@@ -282,7 +283,7 @@ function admin(){
  var out=el("output","","");a.appendChild(out);
  var cp=el("button","btn gold","Copy link");cp.type="button";cp.style.marginTop="14px";
  cp.onclick=function(){if(navigator.clipboard)navigator.clipboard.writeText(out.textContent).then(function(){cp.textContent="Copied"})};a.appendChild(cp);
- a.appendChild(el("p","foot","Without a WhatsApp number or email, the client's send buttons open WhatsApp or mail and the client picks you as the recipient."));
+ a.appendChild(el("p","foot","The client gets one Finish button. With your email it opens a mail to you; with only a WhatsApp number it opens WhatsApp; with neither, a mail with no recipient."));
  app.appendChild(a);make();
  function make(){var q=new URLSearchParams();["c","w","wa","m"].forEach(function(k){var v=F[k].value.trim();if(k==="wa")v=v.replace(/\D/g,"");if(v)q.set(k,v)});
   try{localStorage.setItem("po-admin",JSON.stringify({wa:F.wa.value,m:F.m.value}))}catch(e){}
